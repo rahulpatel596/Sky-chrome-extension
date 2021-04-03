@@ -1,20 +1,15 @@
 {
   "name":"Lets goo!",
-  "description":"Nice background with some useful information",
-  "version":"1.0",
-  "manifest_version": 2,
-  "browser_action":{
-    "default_popup":"index.html",
-    "default_title":"Lets goo!"
-  },
-  "background":{
-    "scripts":["background.js"]
-  },
+  "version":"1.0.0",
+  "manifest_version":2,
   "icons":{
-    "16":"logo.svg"
+    "512":"logo512.png"
   },
-  "chrome_url_overrides":{
-    "newTab":"index.html"
+  "browser_action":{
+    "default_icon":"logo512.png",
+    "default_popup":"index.html"
   },
-  "permissions": ["storage","scripting"]
+  "chrome_url_overrides" : {
+    "newtab": "main.html"
+  }
 }
