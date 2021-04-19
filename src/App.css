@@ -36,3 +36,11 @@
     transform: rotate(360deg);
   }
 }
+
+.ant-modal-header {
+  border: none !important;
+}
+.ant-modal-title {
+  font-size: large !important;
+  font-weight: 600 !important;
+}
