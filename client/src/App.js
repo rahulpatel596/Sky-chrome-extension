@@ -6,12 +6,14 @@ import "./App.css";
 import Setting from "./assets/cog-solid.svg";
 import PreferenceModal from "./components/PreferenceModal";
 import { useEffect, useState } from "react";
+import { changeConfirmLocale } from "antd/lib/modal/locale";
 
 function App() {
   const [isPreferenceVisible, showPreferenceModal] = useState(false);
   let [minute, setMinute] = useState(new Date().getMinutes());
   let [finalMinute, setFinalMinute] = useState(minute);
-  let [preferences, setPreference] = useState([
+  let [isPreferenceSet, setIfPreferenceSet] = useState(false);
+  let [preferences, setPreferences] = useState([
     {
       name: "background",
       prefer: true,
@@ -54,9 +56,9 @@ function App() {
     },
   ]);
 
-  const handlePreference = () => {
-    showPreferenceModal(!isPreferenceVisible);
-  };
+  const handlePreferences = () => {
+    setPreferences(preferences);
+  }
 
   setInterval(function () {
     setMinute(new Date().getMinutes());
@@ -68,13 +70,23 @@ function App() {
   }, 10000);
 
   useEffect(() => {
+    // chrome.storage.sync.get('preferences', function (data) {
+    //   if (!chrome.runtime.error) {
+    //     setPreferences(data);
+    //     setIfPreferenceSet(true)
+    //   }
+    // })
+    // if (!isPreferenceSet) {
+    //   chrome.storage.sync.set({ [preferences]: preferences }, function () {
+    //     console.log("new preferences set")
+    //   })
+    // }
     getUnsplashData();
   }, [preferences]);
 
   let getUnsplashData = () => {
     fetch(
-      `https://source.unsplash.com/featured/${window.innerWidth}x${
-        window.innerHeight
+      `https://source.unsplash.com/featured/${window.innerWidth}x${window.innerHeight
       }/?${preferences.join()}`
     )
       .then((res) => {
@@ -85,12 +97,20 @@ function App() {
       .catch((err) => console.log(err));
   };
 
+  useEffect(() => {
+    let key = 'preferences';
+    // chrome.storage.sync.set({ [key]: preferences }, function () {
+    //   console.log("Preferences set")
+    // })
+  }, [])
+
   return (
-    <Router >
-      <Switch>
-      <Route exact path="/">
+    // <Router >
+    //   <Switch>
+    //     <Route exact path="/">
     <div className="App" style={{ background: "#f0f0f0" }}>
       <PreferenceModal
+        handlePreferences={handlePreferences}
         modalVisible={isPreferenceVisible}
         preferences={preferences}
       />
@@ -112,13 +132,13 @@ function App() {
           {new Date().getHours()}:{minute}
         </span>
       </header>
-        </div>
-        </Route>
-        <Route path="/login" exact>
-          <LoginPage />
-        </Route>
-        </Switch>
-    </Router>
+    </div>
+    // </Route>
+    // <Route path="/login" exact>
+    // <LoginPage />
+    // </Route>
+    // </Switch>
+    // </Router>
   );
 }
 

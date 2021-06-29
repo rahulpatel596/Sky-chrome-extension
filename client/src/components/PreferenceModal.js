@@ -3,25 +3,24 @@ import { Switch, Modal, Button, Checkbox } from "antd";
 import "antd/dist/antd.css";
 import Setting from "../assets/cog-solid.svg";
 
-const PreferenceModal = ({ preferences }) => {
+const PreferenceModal = ({ preferences, handlePreferences }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const showModal = () => {
     setIsModalVisible(true);
   };
 
   const handleOk = () => {
-    setIsModalVisible(false);
+    setIsModalVisible(!isModalVisible)
+    handlePreferences(preferences);
   };
 
   const handleCancel = () => {
     setIsModalVisible(false);
   };
+  
   const handlePreference = (value) => {
-
-    
     let preferenceIndex = preferences.findIndex(x => x.name == value.name);
     preferences[preferenceIndex].prefer = !preferences[preferenceIndex].prefer;
-    console.log(preferences[preferenceIndex])
   };
 
   return (
@@ -38,6 +37,7 @@ const PreferenceModal = ({ preferences }) => {
         title="Preferences"
         visible={isModalVisible}
         onOk={handleOk}
+        okText="Save"
         onCancel={handleCancel}
       >
         <div className="grid grid-cols-2">
@@ -49,7 +49,7 @@ const PreferenceModal = ({ preferences }) => {
               </label>
               <Switch
                 className="w-1"
-                // defaultChecked={value.prefer}
+                defaultChecked={value.prefer}
                 onChange={() => handlePreference(value)}
               />
             </div>
