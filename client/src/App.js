@@ -56,31 +56,31 @@ function App() {
     },
   ]);
 
-  const handlePreferences = () => {
-    setPreferences(preferences);
+  const handlePreferences = (newPreferences) => {
+    setPreferences(newPreferences);
+    chrome.storage.sync.set({ ['preferences']: newPreferences }, (data) => {
+      console.log('Preferences updated', data);
+    })
   }
 
-  setInterval(function () {
-    setMinute(new Date().getMinutes());
+  // setInterval(function () {
+  //   setMinute(new Date().getMinutes());
+  //   if (minute < 10) {
+  //     setFinalMinute("0" + minute);
+  //   } else {
+  //     setFinalMinute(minute);
+  //   }
+  // });
+
+  useEffect(() => {
     if (minute < 10) {
       setFinalMinute("0" + minute);
     } else {
       setFinalMinute(minute);
     }
-  }, 10000);
+  }, [minute])
 
   useEffect(() => {
-    // chrome.storage.sync.get('preferences', function (data) {
-    //   if (!chrome.runtime.error) {
-    //     setPreferences(data);
-    //     setIfPreferenceSet(true)
-    //   }
-    // })
-    // if (!isPreferenceSet) {
-    //   chrome.storage.sync.set({ [preferences]: preferences }, function () {
-    //     console.log("new preferences set")
-    //   })
-    // }
     getUnsplashData();
   }, [preferences]);
 
@@ -98,10 +98,27 @@ function App() {
   };
 
   useEffect(() => {
-    let key = 'preferences';
-    // chrome.storage.sync.set({ [key]: preferences }, function () {
-    //   console.log("Preferences set")
-    // })
+    const storedPreferences2 = new Promise((resolve, reject) => {
+      chrome.storage.sync.get('preferences', data => {
+        if (chrome.runtime.lastError) {
+          return reject(chrome.runtime.lastError)
+        }
+        resolve(data);
+      })
+    })
+    console.log('104', storedPreferences2)
+    storedPreferences2.then((data) => {
+      console.log('103', data.preferences)
+      if (data.preferences != undefined) {
+        setPreferences(data.preferences);
+      } else {
+        chrome.storage.sync.set({ [preferences]: preferences }, function () {
+          console.log("new Preferences set")
+        })
+      }
+    })
+
+
   }, [])
 
   return (
@@ -129,7 +146,7 @@ function App() {
           className=""
           style={{ fontSize: "10rem", color: "white", fontWeight: "700" }}
         >
-          {new Date().getHours()}:{minute}
+          {new Date().getHours()}:{finalMinute}
         </span>
       </header>
     </div>

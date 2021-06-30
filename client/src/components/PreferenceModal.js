@@ -17,10 +17,12 @@ const PreferenceModal = ({ preferences, handlePreferences }) => {
   const handleCancel = () => {
     setIsModalVisible(false);
   };
-  
+
   const handlePreference = (value) => {
+    console.log(value)
     let preferenceIndex = preferences.findIndex(x => x.name == value.name);
     preferences[preferenceIndex].prefer = !preferences[preferenceIndex].prefer;
+    console.log(preferences)
   };
 
   return (
