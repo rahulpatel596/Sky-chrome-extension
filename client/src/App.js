@@ -6,156 +6,146 @@ import "./App.css";
 import Setting from "./assets/cog-solid.svg";
 import PreferenceModal from "./components/PreferenceModal";
 import { useEffect, useState } from "react";
-import { changeConfirmLocale } from "antd/lib/modal/locale";
+import { useDate } from "./components/useDate";
+require('dotenv').config();
+
+const openWeatherAPIKey = process.env.openWeatherAPIKey;
+
 
 function App() {
-  const [isPreferenceVisible, showPreferenceModal] = useState(false);
-  let [minute, setMinute] = useState(new Date().getMinutes());
-  let [finalMinute, setFinalMinute] = useState(minute);
-  let [isPreferenceSet, setIfPreferenceSet] = useState(false);
-  let [preferences, setPreferences] = useState([
-    {
-      name: "background",
-      prefer: true,
-    },
-    {
-      name: "dark",
-      prefer: true,
-    },
-    {
-      name: "nature",
-      prefer: true,
-    },
-    {
-      name: "tropical",
-      prefer: true,
-    },
-    {
-      name: "skyscrapper",
-      prefer: true,
-    },
-    {
-      name: "night",
-      prefer: true,
-    },
-    {
-      name: "mountains",
-      prefer: true,
-    },
-    {
-      name: "Sky",
-      prefer: false,
-    },
-    {
-      name: "ocean",
-      prefer: true,
-    },
-    {
-      name: "dark",
-      prefer: true,
-    },
-  ]);
 
+  const [isPreferenceVisible, showPreferenceModal] = useState(false);
+  let [preferences, setPreferences] = useState([]);
+  let [location, setLocation] = useState({});
+  let [weatherData, setWeatherData] = useState({})
+  let { date, time, wish } = useDate();
+  const [photoInfo, setPhotoInfo] = useState({});
+
+  // Handle preferences
   const handlePreferences = (newPreferences) => {
-    setPreferences(newPreferences);
-    chrome.storage.sync.set({ ['preferences']: newPreferences }, (data) => {
+    console.log('called handlePreferences', newPreferences)
+    setPreferences(newPreferences)
+    chrome.storage.sync.set({ 'preferences': newPreferences }, (data) => {
       console.log('Preferences updated', data);
     })
   }
 
-  // setInterval(function () {
-  //   setMinute(new Date().getMinutes());
-  //   if (minute < 10) {
-  //     setFinalMinute("0" + minute);
-  //   } else {
-  //     setFinalMinute(minute);
-  //   }
-  // });
-
+  // OnLoad useEffect
+  // Get Image and Preferences from chrome.storage
   useEffect(() => {
-    if (minute < 10) {
-      setFinalMinute("0" + minute);
-    } else {
-      setFinalMinute(minute);
-    }
-  }, [minute])
-
-  useEffect(() => {
-    getUnsplashData();
-  }, [preferences]);
-
-  let getUnsplashData = () => {
-    fetch(
-      `https://source.unsplash.com/featured/${window.innerWidth}x${window.innerHeight
-      }/?${preferences.join()}`
-    )
-      .then((res) => {
+    chrome.storage.sync.get('nextImage', (data) => {
+      if (data.nextImage) {
         window.document.querySelector(
           "#imgg"
-        ).style.background = `url(${res.url})`;
-      })
-      .catch((err) => console.log(err));
-  };
+        ).style.background = `url(${data.nextImage})`;
 
-  useEffect(() => {
-    const storedPreferences2 = new Promise((resolve, reject) => {
-      chrome.storage.sync.get('preferences', data => {
-        if (chrome.runtime.lastError) {
-          return reject(chrome.runtime.lastError)
-        }
-        resolve(data);
-      })
+        window.document.querySelector(
+          "#imgg"
+        ).style.backgroundRepeat = `no-repeat`;
+
+        window.document.querySelector(
+          "#imgg"
+        ).style.backgroundSize = `cover`;
+        window.document.querySelector(
+          "#imgg"
+        ).style.backgroundPosition = `center center`;
+      }
+    });
+
+    chrome.storage.sync.get('photoInfo', data => {
+      if (data.photoInfo) {
+        console.log('photoInfo ', data.photoInfo)
+        setPhotoInfo(data.photoInfo);
+      }
     })
-    console.log('104', storedPreferences2)
-    storedPreferences2.then((data) => {
-      console.log('103', data.preferences)
-      if (data.preferences != undefined) {
-        setPreferences(data.preferences);
+
+    // Get Location from chrome.storage
+    chrome.storage.sync.get('location', (data) => {
+      if (data.location.latitude && data.location.longitude) {
+        console.log("Location found")
       } else {
-        chrome.storage.sync.set({ [preferences]: preferences }, function () {
-          console.log("new Preferences set")
-        })
+        console.log('Locating…');
+        navigator.geolocation.getCurrentPosition(position => {
+          const { latitude, longitude } = position.coords;
+          setLocation({ latitude, longitude })
+          chrome.storage.sync.set({ location: { latitude: latitude, longitude: longitude } })
+          // Show a map centered at latitude / longitude.
+        }, (error) => {
+          console.log(error)
+        });
+      }
+    });
+
+    // Getting User background preferences from chrome.storage
+    chrome.storage.sync.get('preferences', data => {
+      console.log('preferences', data);
+      if (data.preferences) {
+        setPreferences(data.preferences)
+      }
+    })
+
+    // Getting weatherData from chrome.storage
+    chrome.storage.sync.get('weatherData', data => {
+      if (data.weatherData) {
+        console.log('weather data 71', data.weatherData.main.temp)
+        setWeatherData(data.weatherData)
       }
     })
 
 
   }, [])
 
+  useEffect(() => {
+    if (weatherData && weatherData.main) {
+      document.querySelector('.weather-icon').style.background = `url(http://openweathermap.org/img/w/${weatherData.weather[0].icon}.png)`;
+    }
+  }, [weatherData])
+
   return (
-    // <Router >
-    //   <Switch>
-    //     <Route exact path="/">
     <div className="App" style={{ background: "#f0f0f0" }}>
       <PreferenceModal
         handlePreferences={handlePreferences}
         modalVisible={isPreferenceVisible}
         preferences={preferences}
       />
-      <header
+
+      <div
         id="imgg"
         style={{
-          width: "100vw",
+          width: "100%",
           height: "100vh",
-          position: "absolute",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
+          backgroundSize: "cover",
+          backgroundPosition: "center center",
+          backgroundRepeat: "no-repeat",
+          textAlign: "center",
+          margin: "auto",
+          padding: "0"
         }}
       >
+        <div className="text-white flex self-start p-4" style={{ backdropFilter: "blur(2px)", width: "10%", borderRadius: "100px" }}>
+          <span className="flex flex-col">
+            <span className="" style={{ fontSize: "1.5rem" }}>{weatherData.main && Math.round(weatherData.main.temp)}	&#8451;</span>
+            <span className="" style={{ fontSize: "1rem" }}>
+              {weatherData && weatherData.name}
+            </span>
+          </span>
+          <span className="weather-icon h-12 w-12"></span>
+        </div>
         <span
-          className=""
-          style={{ fontSize: "10rem", color: "white", fontWeight: "700" }}
+          className="self-center mt-56 flex flex-col items-center justify-center space-y-0"
         >
-          {new Date().getHours()}:{finalMinute}
+          <span style={{ fontSize: "13rem", color: "white", fontWeight: "600", verticalAlign: "bottom" }}>{time.slice(0, -2)}</span>
+          <span style={{ fontSize: "2rem", color: "white", fontWeight: "600", marginTop: "-35px" }}>{wish}</span>
         </span>
-      </header>
+        <div className="flex h-2/6 ml-2">
+          <span className="flex self-end relative text-white" >
+            Photo by &nbsp;<a href={photoInfo && photoInfo.link}>{photoInfo && photoInfo.userName}</a><span> &nbsp; / &nbsp; </span> <a href="https://unsplash.com/"> Unsplash</a>
+          </span>
+        </div>
+      </div>
+
     </div>
-    // </Route>
-    // <Route path="/login" exact>
-    // <LoginPage />
-    // </Route>
-    // </Switch>
-    // </Router>
+
   );
 }
 

@@ -1,0 +1,109 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+.wrapper{
+    position: fixed;
+    z-index: 80;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: rgb(0, 6, 6);
+    clip-path: circle(25px at calc(100% - 45px) 45px);
+    transition: all 0.5s ease-in-out;
+  }
+#active:checked ~ .wrapper{
+    clip-path: circle(75%);
+  }
+.menu-btn{
+    position: absolute;
+    z-index: 90;
+    right: 20px;
+    top: 20px;
+    height: 50px;
+    width: 50px;
+    text-align: center;
+    line-height: 50px;
+    border-radius: 50%;
+    font-size: 20px;
+    color: #fff;
+    cursor: pointer;
+    background: rgb(0, 0, 0);
+    transition: all 0.3s ease-in-out;
+  }
+#active:checked ~ .menu-btn{
+    color: #fff;
+  }
+#active:checked ~ .menu-btn i:before{
+    content: "\f00d";
+  }
+
+input[type="checkbox"]{
+    display: none;
+  }
+.content{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: -1;
+    text-align: center;
+    width: 100%;
+    color: #202020;
+  }
+.content .title{
+    font-size: 40px;
+    font-weight: 700;
+  }
+.content p{
+    font-size: 35px;
+    font-weight: 600;
+  }
+  
+  @keyframes rotate {
+    0%{
+      filter: hue-rotate(0deg);
+    }
+    100%{
+      filter: hue-rotate(360deg);
+    }
+  }
+.ant-switch.w-1.ml-2.border-2.border-white-200:not(.ant-switch-checked){
+  border: 1px solid white;
+}
+
+/* .saveButton::after{
+  transition: transform .45s cubic-bezier(.785, .135, .15, .86);
+  background-color: #5c5c5c;
+  tranform-origin: right center;
+  color: white;
+  transform:scale(0,1);
+} */
+.saveButton{
+	margin-top: 12px;
+  margin-left:-40px;
+	border: 2px solid white;
+	position: relative;
+}
+.saveButton::before{
+  transition:all .45s cubic-bezier(.785, .135, .15, .86),border .45s cubic-bezier(.785, .135, .15, .86);
+  content: '';
+  width: 50%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.saveButton:hover::before{
+  background-color: white;
+  width:100%;
+}
+
+
+.saveButton-text{
+  color: white;
+  font-size:1rem;
+  mix-blend-mode: difference;
+}

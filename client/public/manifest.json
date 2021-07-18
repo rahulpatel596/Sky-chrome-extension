@@ -9,10 +9,18 @@
   "browser_action": {
     "default_icon": "logo512.png"
   },
+  "background": {
+    "scripts": [
+      "background.js"
+    ],
+    "persistent": false
+  },
   "chrome_url_overrides": {
     "newtab": "index.html"
   },
   "permissions": [
-    "storage"
+    "storage",
+    "alarms",
+    "geolocation"
   ]
 }
