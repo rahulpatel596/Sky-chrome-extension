@@ -124,7 +124,7 @@ function App() {
       >
         <div className="text-white flex self-start p-4" style={{ backdropFilter: "blur(2px)", width: "10%", borderRadius: "100px" }}>
           <span className="flex flex-col">
-            <span className="" style={{ fontSize: "1.5rem" }}>{weatherData.main && Math.round(weatherData.main.temp)}	&#8451;</span>
+            <span className="flex" style={{ fontSize: "1.5rem" }}><span>{weatherData.main && Math.round(weatherData.main.temp)}</span><span className={`${weatherData.name ? "" : "hidden"}`}>&#8451;</span></span>
             <span className="" style={{ fontSize: "1rem" }}>
               {weatherData && weatherData.name}
             </span>

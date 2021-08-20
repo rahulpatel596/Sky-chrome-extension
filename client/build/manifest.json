@@ -1,13 +1,14 @@
 {
-  "name": "Lets goo!",
-  "version": "1.0.0",
+  "name": "Skyy",
+  "version": "1.0.2",
+  "description": "",
   "manifest_version": 2,
   "icons": {
-    "512": "logo512.png",
-    "192": "logo192.png"
+    "512": "LogoSky.png",
+    "192": "LogoSky.png"
   },
   "browser_action": {
-    "default_icon": "logo512.png"
+    "default_icon": "LogoSky.png"
   },
   "background": {
     "scripts": [

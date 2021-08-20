@@ -8,7 +8,9 @@ chrome.runtime.onInstalled.addListener(() => {
     let geoSuccess = position => {
         console.log(position)
         const { latitude, longitude } = position.coords;
-        chrome.storage.sync.set({ location: { latitude: latitude, longitude: longitude } })
+        chrome.storage.sync.set({ location: { latitude: latitude, longitude: longitude } }, function () {
+            getWeatherData();
+        })
     }
     let geoError = (error) => {
         console.log(error)
@@ -23,19 +25,19 @@ chrome.runtime.onInstalled.addListener(() => {
         preferences: [
             {
                 name: "Forest",
-                prefer: true,
+                prefer: false,
             },
             {
                 name: "Nature",
-                prefer: true,
+                prefer: false,
             },
             {
                 name: "Tropical",
-                prefer: true,
+                prefer: false,
             },
             {
                 name: "WaterFalls",
-                prefer: true,
+                prefer: false,
             },
             {
                 name: "Wallpapers",
@@ -43,28 +45,27 @@ chrome.runtime.onInstalled.addListener(() => {
             },
             {
                 name: "Night",
-                prefer: true,
+                prefer: false,
             },
             {
                 name: "Sky",
-                prefer: true,
+                prefer: false,
             },
             {
                 name: "Mountains",
-                prefer: true,
+                prefer: false,
             },
             {
                 name: "Ocean",
-                prefer: true,
+                prefer: false,
             },
             {
                 name: "SnowFall",
-                prefer: true,
+                prefer: false,
             },
         ]
     });
     getRandomPhoto();
-    getWeatherData();
     // create alarm after extension is installed / upgraded
     chrome.alarms.create('refresh', { periodInMinutes: 60 });
 });
